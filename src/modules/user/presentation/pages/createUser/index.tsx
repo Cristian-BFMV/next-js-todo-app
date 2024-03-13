@@ -13,9 +13,13 @@ interface CreateUserProps {
 
 export const CreateUser = async ({ createUserCommand }: CreateUserProps) => {
   return (
-    <>
-      <CreateUserFormSteps />
-      <CreateUserForm createUserCommand={createUserCommand} />
-    </>
+    <section>
+      <header className="flex justify-center">
+        <CreateUserFormSteps />
+      </header>
+      <article className="flex justify-center">
+        <CreateUserForm createUserCommand={createUserCommand} />
+      </article>
+    </section>
   );
 };
