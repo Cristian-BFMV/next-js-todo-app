@@ -1,8 +1,9 @@
-"use server";
+"use client";
 
 import { CreateUserState } from "@/modules/user/application/command/createUser.command";
 import { CreateUserForm } from "../../components/createUserForm";
 import { CreateUserFormSteps } from "../../components/createUserFormSteps";
+import { useState } from "react";
 
 interface CreateUserProps {
   createUserCommand: (
@@ -11,14 +12,24 @@ interface CreateUserProps {
   ) => Promise<CreateUserState | undefined>;
 }
 
-export const CreateUser = async ({ createUserCommand }: CreateUserProps) => {
+export const CreateUser = ({ createUserCommand }: CreateUserProps) => {
+  const [activeStep, setActiveStep] = useState<1 | 2>(1);
+
+  const handleChangeActiveStep = (newActiveStep: 1 | 2) => {
+    setActiveStep(newActiveStep);
+  };
+
   return (
-    <section>
+    <section className="flex flex-col gap-8 h-full justify-center">
       <header className="flex justify-center">
-        <CreateUserFormSteps />
+        <CreateUserFormSteps activeStep={activeStep} />
       </header>
       <article className="flex justify-center">
-        <CreateUserForm createUserCommand={createUserCommand} />
+        <CreateUserForm
+          activeStep={activeStep}
+          createUserCommand={createUserCommand}
+          handleChangeActiveStep={handleChangeActiveStep}
+        />
       </article>
     </section>
   );

@@ -1,9 +1,9 @@
 import { prisma } from "@/config/db/prisma";
-import { User } from "../../domain/entity/user.entity";
 import { CreateUserRepository } from "../../domain/repository/user.repository";
+import { UserWithoutId } from "../../domain/entity/user.entity";
 
 export const createUserRepository: CreateUserRepository = async (
-  user: Omit<User, "id">
+  user: UserWithoutId
 ) => {
   "use server";
 
