@@ -4,6 +4,7 @@ import { CreateUserState } from "@/modules/user/application/command/createUser.c
 import { CreateUserForm } from "../../components/createUserForm";
 import { CreateUserFormSteps } from "../../components/createUserFormSteps";
 import { useState } from "react";
+import { CreateUserFormProvider } from "../../context/createUserForm";
 
 interface CreateUserProps {
   createUserCommand: (
@@ -25,11 +26,13 @@ export const CreateUser = ({ createUserCommand }: CreateUserProps) => {
         <CreateUserFormSteps activeStep={activeStep} />
       </header>
       <article className="flex justify-center">
-        <CreateUserForm
-          activeStep={activeStep}
-          createUserCommand={createUserCommand}
-          handleChangeActiveStep={handleChangeActiveStep}
-        />
+        <CreateUserFormProvider>
+          <CreateUserForm
+            activeStep={activeStep}
+            createUserCommand={createUserCommand}
+            handleChangeActiveStep={handleChangeActiveStep}
+          />
+        </CreateUserFormProvider>
       </article>
     </section>
   );

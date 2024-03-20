@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label";
 import { CreateUserState } from "@/modules/user/application/command/createUser.command";
 import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/button";
+import { CreateUserFormFirstStep } from "../createUserFormFirstStep";
+import { CreateUserFormSecondStep } from "../createUserFormSecondStep";
+import { ReactNode } from "react";
 
 interface CreateUserProps {
   activeStep: 1 | 2;
@@ -14,6 +17,11 @@ interface CreateUserProps {
   ) => Promise<CreateUserState | undefined>;
   handleChangeActiveStep: (newActiveStep: 1 | 2) => void;
 }
+
+const formStepsComponents: Record<1 | 2, ReactNode> = {
+  "1": <CreateUserFormFirstStep />,
+  "2": <CreateUserFormSecondStep />,
+};
 
 const initialState = { message: "", errors: {} };
 
@@ -27,60 +35,7 @@ export const CreateUserForm = ({
   return (
     <div className="border p-6 rounded w-full max-w-[40rem]">
       <form action={dispatch} className="flex flex-col gap-4">
-        <fieldset>
-          <Label htmlFor="email">Correo Electrónico</Label>
-          <Input
-            id="email"
-            name="email"
-            placeholder="Ingresa tu correo electrónico"
-            type="email"
-          />
-        </fieldset>
-        <fieldset>
-          <Label htmlFor="name">Nombres</Label>
-          <Input
-            id="name"
-            name="name"
-            placeholder="Ingresa tus nombres"
-            type="text"
-          />
-        </fieldset>
-        <fieldset>
-          <Label htmlFor="lastName">Apellidos</Label>
-          <Input
-            id="lastName"
-            name="lastName"
-            placeholder="Ingresa tus apellidos"
-            type="text"
-          />
-        </fieldset>
-        <fieldset>
-          <Label htmlFor="password">Contraseña</Label>
-          <Input
-            id="password"
-            name="password"
-            placeholder="Ingresa tu contraseña"
-            type="password"
-          />
-        </fieldset>
-        <fieldset>
-          <Label htmlFor="phone">Teléfono</Label>
-          <Input
-            id="phone"
-            name="phone"
-            placeholder="Ingresa tu teléfono"
-            type="text"
-          />
-        </fieldset>
-        <fieldset>
-          <Label htmlFor="username">Nombre de usuario</Label>
-          <Input
-            id="username"
-            name="username"
-            placeholder="Ingresa tu nombre de usuario"
-            type="text"
-          />
-        </fieldset>
+        {formStepsComponents[`${activeStep}`]}
 
         <div className="grid grid-cols-2 gap-4 items-center ">
           <Button
