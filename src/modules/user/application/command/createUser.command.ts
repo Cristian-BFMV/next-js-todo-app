@@ -3,6 +3,7 @@ import { CreateUserRepository } from "../../domain/repository/user.repository";
 
 export type CreateUserState = {
   errors?: {
+    confirmPassword?: string[];
     email?: string[];
     name?: string[];
     lastName?: string[];
@@ -19,6 +20,7 @@ export const generateCreateUserCommand =
     "use server";
 
     const validatedFields = CreateUserSchema.safeParse({
+      confirmPassword: userData.get("confirmPassword"),
       email: userData.get("email"),
       lastName: userData.get("lastName"),
       name: userData.get("name"),
@@ -27,11 +29,12 @@ export const generateCreateUserCommand =
       username: userData.get("username"),
     });
 
-    if (!validatedFields.success)
+    if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
         message: "Por favor llena todos los campos requeridos",
       };
+    }
 
     try {
       await createUserRepository(validatedFields.data);

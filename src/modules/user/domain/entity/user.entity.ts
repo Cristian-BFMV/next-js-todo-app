@@ -4,8 +4,12 @@ import { z } from "zod";
 export const UserSchema = z.object({
   email: z.string().email({ message: "El email ingresado es invalido" }),
   id: z.string(),
-  lastName: z.string(),
-  name: z.string(),
+  lastName: z
+    .string({ required_error: "Los apellidos son requeridos" })
+    .min(1, { message: "Los apellidos son requeridos" }),
+  name: z
+    .string({ required_error: "Los nombres son requeridos" })
+    .min(1, { message: "Los nombres son requeridos" }),
   password: z
     .string()
     .regex(/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[A-Z]).*/, {
@@ -18,12 +22,24 @@ export const UserSchema = z.object({
       return hashSync(password, salt);
     }),
   phone: z.string().length(10, "El teléfono debe de ser de 10 dígitos"),
-  username: z.string(),
+  username: z
+    .string({ required_error: "El nombre de usuario es requerido" })
+    .min(1, { message: "El nombre de usuario es requerido" }),
 });
 
-export const CreateUserSchema = UserSchema.omit({ id: true });
-
+export const CreateUserSchema = UserSchema.omit({ id: true })
+  .extend({
+    confirmPassword: z
+      .string({
+        required_error: "La confirmación de la contraseña es requerida",
+      })
+      .min(1, { message: "La confirmación de la contraseña es requerida" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
+  });
 
 export type User = z.infer<typeof UserSchema>;
 
-export type UserWithoutId = z.infer<typeof CreateUserSchema>
+export type CreateUser = z.infer<typeof CreateUserSchema>;

@@ -1,11 +1,11 @@
 "use client";
 
-import { ReactNode, createContext, useState } from "react";
-import { UserWithoutId } from "../../../domain/entity/user.entity";
+import { createContext, useState, type ReactNode } from "react";
+import type { CreateUser } from "../../../domain/entity/user.entity";
 
 export const CreateUserFormContext = createContext<{
-  updateUserInfo: (userInfo: Partial<UserWithoutId>) => void;
-  user: UserWithoutId | null;
+  updateUserInfo: (userInfo: Partial<CreateUser>) => void;
+  user: CreateUser | null;
 }>({ updateUserInfo: () => null, user: null });
 
 export const CreateUserFormProvider = ({
@@ -13,12 +13,18 @@ export const CreateUserFormProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [user, setUser] = useState<UserWithoutId | null>(null);
+  const [user, setUser] = useState<CreateUser>({
+    confirmPassword: "",
+    email: "",
+    lastName: "",
+    name: "",
+    password: "",
+    phone: "",
+    username: "",
+  });
 
-  const updateUserInfo = (userInfo: Partial<UserWithoutId>) => {
+  const updateUserInfo = (userInfo: Partial<CreateUser>) => {
     setUser((prevUser) => {
-      if (!prevUser) return null;
-
       return {
         ...prevUser,
         ...userInfo,
