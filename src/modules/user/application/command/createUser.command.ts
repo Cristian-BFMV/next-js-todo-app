@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { CreateUserSchema } from "../../domain/entity/user.entity";
 import { CreateUserRepository } from "../../domain/repository/user.repository";
 
@@ -37,8 +38,28 @@ export const generateCreateUserCommand =
     }
 
     try {
-      await createUserRepository(validatedFields.data);
+      const { confirmPassword, ...user } = validatedFields.data;
+      await createUserRepository(user);
+      return {
+        errors: {},
+        message: "SUCCESS",
+      };
     } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const target = error.meta?.target as Array<string>;
+
+        return {
+          message: `Una cuenta con este ${
+            target.includes("email") ? "correo y/o" : ""
+          } ${
+            target.includes("username") ? "nombre de usuario" : ""
+          } ya ha sido creado`,
+        };
+      }
+
       return {
         message: "Lo sentimos, ha ocurrido un problema",
       };

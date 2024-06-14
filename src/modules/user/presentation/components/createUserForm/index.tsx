@@ -1,12 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import type { CreateUserState } from "@/modules/user/application/command/createUser.command";
 import clsx from "clsx";
-import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, type ReactNode } from "react";
 import { useFormState } from "react-dom";
+import { CreateUserFormActions } from "../createUserFormActions";
 import { CreateUserFormFirstStep } from "../createUserFormFirstStep";
 import { CreateUserFormSecondStep } from "../createUserFormSecondStep";
+import { CreateUserFormSuccess } from "../createUserFormSuccess";
 
 interface CreateUserProps {
   activeStep: 1 | 2;
@@ -25,7 +27,7 @@ const formStepsComponents: Record<
   "2": (state) => <CreateUserFormSecondStep state={state} />,
 };
 
-const initialState = { message: "", errors: {} };
+const initialState = { errors: {}, message: "" };
 
 export const CreateUserForm = ({
   activeStep,
@@ -33,58 +35,57 @@ export const CreateUserForm = ({
   handleChangeActiveStep,
 }: CreateUserProps) => {
   const [state, dispatch] = useFormState(createUserCommand, initialState);
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleCloseModal = () => {
+    router.push("/auth/login");
+  };
+
+  useEffect(() => {
+    if (state?.message === "SUCCESS") setOpen(true);
+  }, [state]);
 
   return (
-    <div className="border p-6 rounded w-full max-w-[40rem]">
-      <form action={dispatch} className="flex flex-col gap-4">
-        <div
-          className={clsx("flex flex-col gap-4", {
-            block: activeStep === 1,
-            hidden: activeStep === 2,
-          })}
-        >
-          {formStepsComponents[1](state)}
-        </div>
-        <div
-          className={clsx("flex flex-col gap-4", {
-            block: activeStep === 2,
-            hidden: activeStep === 1,
-          })}
-        >
-          {formStepsComponents[2](state)}
-        </div>
-
-        {state && state.message && (
-          <p className="text-sm text-red-500">{state.message}</p>
-        )}
-
-        <div className="grid grid-cols-2 gap-4 items-center ">
-          <Button
-            className="w-full"
-            type="button"
-            variant="outline"
-            {...(activeStep === 1
-              ? { onClick: () => alert("Cancelar") }
-              : { onClick: () => handleChangeActiveStep(1) })}
+    <>
+      <div className="border p-6 rounded w-full max-w-[40rem]">
+        <form action={dispatch} className="flex flex-col gap-4">
+          <div
+            aria-hidden={activeStep === 2}
+            aria-labelledby="step-1-label"
+            aria-live="polite"
+            className={clsx("flex flex-col gap-4", {
+              block: activeStep === 1,
+              hidden: activeStep === 2,
+            })}
+            id="step-1-content"
           >
-            {activeStep === 1 ? "Cancelar" : "Atrás"}
-          </Button>
-          {activeStep === 1 && (
-            <Button
-              className="w-full"
-              onClick={() => handleChangeActiveStep(2)}
-              type="button"
-            >
-              Siguiente
-            </Button>
+            {formStepsComponents[1](state)}
+          </div>
+          <div
+            aria-labelledby="step-2-label"
+            aria-hidden={activeStep === 1}
+            aria-live="polite"
+            className={clsx("flex flex-col gap-4", {
+              block: activeStep === 2,
+              hidden: activeStep === 1,
+            })}
+            id="step-2-content"
+          >
+            {formStepsComponents[2](state)}
+          </div>
+
+          {state && state.message && state.message !== "SUCCESS" && (
+            <p className="text-sm text-red-500">{state.message}</p>
           )}
-          {activeStep === 2 && (
-            <Button className="w-full" type="submit">
-              Crear cuenta
-            </Button>
-          )}
-        </div>
-      </form>
-    </div>
+
+          <CreateUserFormActions
+            activeStep={activeStep}
+            handleChangeActiveStep={handleChangeActiveStep}
+          />
+        </form>
+      </div>
+      <CreateUserFormSuccess handleCloseModal={handleCloseModal} open={open} />
+    </>
   );
 };

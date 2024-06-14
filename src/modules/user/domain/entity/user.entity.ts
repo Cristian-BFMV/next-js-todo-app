@@ -1,6 +1,8 @@
 import { genSaltSync, hashSync } from "bcrypt";
 import { z } from "zod";
 
+const salt = genSaltSync();
+
 export const UserSchema = z.object({
   email: z.string().email({ message: "El email ingresado es invalido" }),
   id: z.string(),
@@ -11,14 +13,12 @@ export const UserSchema = z.object({
     .string({ required_error: "Los nombres son requeridos" })
     .min(1, { message: "Los nombres son requeridos" }),
   password: z
-    .string()
+    .string({ required_error: "La contraseña es requerida" })
     .regex(/(?=.*\d)(?=.*[!@#$%^&*])(?=.*[A-Z]).*/, {
       message:
         "La contraseña debe incluir al menos un número, al menos un símbolo y al menos una mayúscula",
     })
     .transform((password: string) => {
-      const salt = genSaltSync();
-
       return hashSync(password, salt);
     }),
   phone: z.string().length(10, "El teléfono debe de ser de 10 dígitos"),
@@ -33,7 +33,10 @@ export const CreateUserSchema = UserSchema.omit({ id: true })
       .string({
         required_error: "La confirmación de la contraseña es requerida",
       })
-      .min(1, { message: "La confirmación de la contraseña es requerida" }),
+      .min(1, { message: "La confirmación de la contraseña es requerida" })
+      .transform((password: string) => {
+        return hashSync(password, salt);
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",

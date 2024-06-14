@@ -74,18 +74,22 @@ export const CreateUserFormSecondStep = ({
 
       <div className="flex flex-col gap-2">
         <CreateUserFormPasswordValidation
+          ariaLabel="de tener al menos un número"
           isValid={passwordValidations.hasANumber}
           label="La contraseña tiene un número"
         />
         <CreateUserFormPasswordValidation
+          ariaLabel="de tener al menos un carácter especial"
           isValid={passwordValidations.hasASpecialCharacter}
           label="La contraseña tiene un carácter especial"
         />
         <CreateUserFormPasswordValidation
+          ariaLabel="de tener al menos una mayúscula"
           isValid={passwordValidations.hasAUppercaseLetter}
           label="La contraseña tiene un carácter en mayúscula"
         />
         <CreateUserFormPasswordValidation
+          ariaLabel="de coincidir las contraseñas"
           isValid={passwordValidations.hasPasswordsMatch}
           label="Las contraseñas coinciden"
         />
